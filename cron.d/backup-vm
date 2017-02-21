@@ -1,0 +1,5 @@
+# /etc/cron.d/backup-vm: crontab entries for the POLHEC package
+
+MAILTO=root
+
+37 20 * * * root	if [ -x /root/bin/backup-vm.sh ]; then nice -n10 /root/bin/backup-vm.sh; fi
