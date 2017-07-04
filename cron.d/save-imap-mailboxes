@@ -1,0 +1,22 @@
+#!/bin/bash
+
+vm_hosts=("kastor")
+user='root'
+
+remote_dir='/srv'
+root='/srv/backup/imap'
+
+MKDIR='mkdir -p'
+RSYNC='rsync -a --delete'
+
+[ -d $root ] || $MKDIR $root
+
+for host in "${vm_hosts[@]}"; do
+	local_dir="$root/$host"
+	[ -d $local_dir ] || $MKDIR $local_dir
+
+	$RSYNC $user@$host:$remote_dir/cyrus/ $local_dir/cyrus/
+	$RSYNC $user@$host:$remote_dir/imap/ $local_dir/imap/
+    $RSYNC $user@$host:$remote_dir/sieve/ $local_dir/sieve/
+done
+

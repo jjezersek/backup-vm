@@ -1,0 +1,30 @@
+#!/bin/bash
+
+vm_hosts=("pepe" "liza" "edo" "ceuka" "jetty")
+user='root'
+
+vm_src='/srv/backup-vm'
+vm_dst='/srv/backup/vm'
+lib_src='/etc/libvirt/qemu'
+lib_dst='/srv/backup//qemu'
+
+
+FIND='find'
+INTERVAL="+180"
+MKDIR='mkdir -p'
+RM='rm -v'
+RSYNC='rsync -av'
+
+[ -d $vm_dst ] || $MKDIR $vm_dst
+[ -d $lib_dst ] || $MKDIR $lib_dst
+
+
+for host in "${vm_hosts[@]}"; do
+	echo "Processing $host"
+	$RSYNC $user@$host:$vm_src/ $vm_dst/
+	$RSYNC $user@$host:$lib_src/ $lib_dst/
+done
+
+## clean old VM
+$FIND $vm_dst/* -mtime $INTERVAL  -exec $RM {} +
+$FIND $lib_dst/* -mtime $INTERVAL  -exec $RM {} +

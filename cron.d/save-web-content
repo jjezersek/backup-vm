@@ -1,0 +1,19 @@
+#!/bin/bash
+
+vm_hosts=("www.rcp.ijs.si")
+user='root'
+
+remote_dir='/srv'
+root='/srv/backup/web'
+
+MKDIR='mkdir -p'
+RSYNC='rsync -a --delete'
+
+[ -d $root ] || $MKDIR $root
+
+for host in "${vm_hosts[@]}"; do
+	local_dir="$root/$host"
+	[ -d $local_dir ] || $MKDIR $local_dir
+
+	$RSYNC $user@$host:$remote_dir/ $local_dir/
+done
