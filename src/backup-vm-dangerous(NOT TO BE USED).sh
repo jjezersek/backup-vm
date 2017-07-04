@@ -2,7 +2,7 @@
 set -e
 debug=1
 # DO NOT USE
-# IT BREAKSY VM
+# IT BREAKS VM
 
 image_dir='/var/lib/libvirt/images'
 backup_dir='/srv/backup-vm'

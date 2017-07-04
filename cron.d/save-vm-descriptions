@@ -13,7 +13,7 @@ FIND='find'
 INTERVAL="+180"
 MKDIR='mkdir -p'
 RM='rm -v'
-RSYNC='rsync -av'
+RSYNC='rsync -a'
 
 [ -d $vm_dst ] || $MKDIR $vm_dst
 [ -d $lib_dst ] || $MKDIR $lib_dst
