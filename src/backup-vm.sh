@@ -1,6 +1,32 @@
 #!/bin/bash
+# ---------------------------------------------------------------------------
+# backup-vm - Do backup of virtual domain on host server.
 
+# This program is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+
+# This program is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License at <http://www.gnu.org/licenses/> for
+# more details.
+
+# For usage, run "backup-vm -h" or see https://github.com/srvrco/getssl
+
+# Revision history:
+# 2017-02-21 Created (v0.1)
+# 2017-03-15 Online snapshots of domain (v0.2)
+# 2017-09-27 Automatic switch to offline backup if domain has additional disks (v0.3)
+# ---------------------------------------------------------------------------
+
+PROGNAME=${0##*/}
+VERSION="0.3"
+
+# defaults
 backup_dir="/srv/backup-vm"
+vm_description_dir="/etc/libvirt/qemu/"
 date=$(date +%Y%m%d)
 name="ssb$date"
 offline=0
@@ -48,6 +74,25 @@ function is_shutoff () {
 	local domain=$1
 	output=$(virsh list --state-shutoff --name |grep $domain)
 	return $?
+}
+
+# Name:		has_external_disk
+#
+# Description:
+#	check if domain has external additional disk
+#
+# Parameters:
+#	$domain		@string	remote domain name
+# Return:
+#	0	domain has disk
+#	1	domain has no disk
+#
+function has_external_disk () {
+	local domain=$1
+	vm_description="$vm_description_dir/$domain.xml"
+	grep --quiet "<disk type='block' device='disk'>" $vm_description
+	return $?
+		
 }
 
 # Name:	shutdown_domain
@@ -196,9 +241,21 @@ eval is_shutoff $domain
 status=$?
 if [ $status -eq 0 ] ; then
 	if [ "$verbose" == "-v" ]; then
-		echo "Force offline mode"
+		echo "Domain is offline. Force offline mode."
 	fi
 	offline=1
+fi
+
+# Does VM have additional disks
+if [ $offline -eq 0 ] ; then
+	eval has_external_disk $domain
+	status=$?
+	if [ $status -eq 0 ] ; then
+		if [ "$verbose" == "-v" ]; then
+			echo "Domain has additional additional disk. Force offline mode."
+		fi
+		offline=1
+	fi
 fi
 
 # Set some variables
