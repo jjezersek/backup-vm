@@ -1,6 +1,6 @@
 #!/bin/bash
 
-backupDir="/srv/backup-vm"
+backup_dir="/srv/backup-vm"
 date=$(date +%Y%m%d)
 name="ssb$date"
 offline=0
@@ -188,7 +188,7 @@ if [ "$verbose" == "-v" ]; then
 fi
 
 #create room for backup
-[ -d "$backupDir" ] || mkdir -p $backupDir
+[ -d "$backup_dir" ] || mkdir -p $backup_dir
 
 
 # Force offline backup if domain is offline, sic
@@ -209,7 +209,7 @@ if [ "$source" == "" ]; then
 fi
 extension="${source##*.}"
 snapshot="${source%/*}/$domain-$name.$extension"
-backup="$backupDir/$domain.$extension-$date"
+backup="$backup_dir/$domain.$extension-$date"
 
 # Do the job
 if [ $offline -eq 0 ] ; then
